@@ -244,15 +244,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:#FFF8EE;cursor:none}
     }
   }
 
-  // the TV page itself was updated: reload it (only between celebrations)
-  var myTag = null;
+  // the TV page itself was changed: reload it (only between celebrations). Compares the page's text, because
+  // GitHub gives every file a new date each time anything is published.
+  var myText = null;
   function selfCheck(){
     if (busy) return;
-    fetch(location.pathname + "?ping=" + Date.now(), {method: "HEAD", cache: "no-store"}).then(function(r){
-      var t = r.ok ? tagOf(r) : "";
-      if (!t) return;
-      if (myTag === null) myTag = t;
-      else if (t !== myTag && !busy){ var q = new URLSearchParams(location.search); q.set("r", Date.now()); location.replace(location.pathname + "?" + q); }
+    fetch(location.pathname + "?ping=" + Date.now(), {cache: "no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){
+      if (!t || t.indexOf("fabTreeSeen") < 0) return;
+      if (myText === null) myText = t;
+      else if (t !== myText && !busy){ var q = new URLSearchParams(location.search); q.set("r", Date.now()); location.replace(location.pathname + "?" + q); }
     }).catch(function(){});
   }
 
@@ -264,7 +264,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#FFF8EE;cursor:none}
     setInterval(function(){ check(false); }, POLL);
   }
   selfCheck();
-  setInterval(selfCheck, 1800000);
+  setInterval(selfCheck, Math.max(10, +SP.get("self") || 1800) * 1000);
 })();
 </script>
 </body>
