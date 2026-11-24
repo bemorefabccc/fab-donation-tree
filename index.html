@@ -221,7 +221,38 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);-webkit-fo
     box.style.gridTemplateColumns = "repeat(" + best.c + ",minmax(0,1fr))";
     box.style.setProperty("--f", best.f.toFixed(2) + "vh");
   }
+  // bigger decorations on the TV tree: as big as they can go (up to 40% bigger) without bumping into each other
+  var BOOST = 1;
+  function enlarge(){
+    var items = placed.map(function(s){
+      var candy = s.sup.tier === "candy";
+      return {s: s, x: s.hx - (candy ? 4 : 0), cy: s.shape.cy, r: candy ? 50 : s.shape.R + 6};
+    });
+    for (var f = 1.4; f > 1.001; f -= 0.05){
+      var k = SCALE * f, ok = true;
+      for (var i = 0; i < items.length && ok; i++){
+        var a = items[i], ay = a.s.hy + a.cy * k, ar = a.r * k;
+        if (a.x - ar < 14 || a.x + ar > 1066 || ay + ar > 1195) ok = false;
+        for (var j = i + 1; j < items.length && ok; j++){
+          var b = items[j], by = b.s.hy + b.cy * k, br = b.r * k;
+          if (Math.hypot(a.x - b.x, ay - by) < ar + br + 4) ok = false;
+        }
+      }
+      if (ok){ BOOST = f; break; }
+    }
+    if (BOOST === 1) return;
+    var k = SCALE * BOOST;
+    items.forEach(function(a){ a.s.pos.setAttribute("transform", "translate(" + a.s.hx + "," + a.s.hy + ") scale(" + k + ")"); });
+    // hide any spare glass baubles the bigger ones now cover
+    SWINGERS.forEach(function(g){
+      if (g.sup || g.pos) return;
+      var gy = g.hy + 50;
+      var hit = items.some(function(a){ return Math.hypot(a.x - g.hx, a.s.hy + a.cy * k - gy) < a.r * k + 34; });
+      if (hit) g.node.setAttribute("display", "none");
+    });
+  }
   function run(){
+    try { enlarge(); } catch (e) {}
     var box = build();
     var tiles = [].slice.call(box.children);
     var order = placed.slice(), idx = order.length - 1;
@@ -235,7 +266,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);-webkit-fo
         BANNER.l2.setAttribute("font-size", 30);
         setBanner(s.sup);
         bannerIn(performance.now());
-        burst(s.hx, s.hy + ((s.shape && s.shape.cy) || 0), 26, 300);
+        burst(s.hx, s.hy + ((s.shape && s.shape.cy) || 0) * SCALE * BOOST, 26, 300);
       } catch (e) {}
       mark(s);
     }
