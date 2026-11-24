@@ -134,6 +134,135 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);-webkit-fo
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready); else ready();
 })();
 </script>
+
+<!-- Office TV view: only used with ?view=tv -->
+<script>
+(function(){
+  if (new URLSearchParams(location.search).get("view") !== "tv") return;
+  document.documentElement.classList.add("fab-tv");
+  var st = document.createElement("style");
+  st.textContent = "\nhtml.fab-tv,html.fab-tv body{height:100%;overflow:hidden;cursor:none}\nhtml.fab-tv body{background:radial-gradient(120% 95% at 88% 0%,#FFE7BF 0%,#FFF8EE 58%)}\nhtml.fab-tv .wrap{max-width:none;height:100vh;margin:0;padding:3vh 3.4vh;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3.6vh;align-items:stretch}\nhtml.fab-tv .stage{height:94vh;width:auto;aspect-ratio:1080/1350;border-radius:3.2vh}\nhtml.fab-tv .key,html.fab-tv .card{display:none!important}\n.tv-panel{min-width:0;height:94vh;display:flex;flex-direction:column;gap:2.2vh}\n.tv-head h1{margin:0;font-family:var(--display);font-weight:400;color:var(--fab-red);font-size:6vh;line-height:1.04;text-wrap:balance}\n.tv-count{margin:.7vh 0 0;font-size:2.5vh;color:#8a4a26}\n.tv-count b{color:var(--ink)}\n.tv-sups{flex:1 1 auto;min-height:0;display:grid;gap:1.6vh;align-content:center;justify-content:center;overflow:hidden;padding:1.4vh}\n.tv-sup{background:#fff;border-radius:1.8vh;padding:calc(var(--tile,26vh)*.05);display:grid;gap:calc(var(--tile,26vh)*.035);align-content:start;\n  box-shadow:0 1px 0 rgba(232,68,50,.06),0 1vh 2.4vh -1.4vh rgba(150,50,20,.4);transition:transform .6s ease,box-shadow .6s ease}\n.tv-sup.on{transform:scale(1.025);box-shadow:0 0 0 .55vh #FFC14D,0 1.6vh 3vh -1.4vh rgba(150,50,20,.55)}\n.tv-plate{aspect-ratio:2.3/1;border-radius:1.3vh;display:grid;place-items:center;padding:7% 9%;overflow:hidden}\n.tv-plate img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}\n.tv-plate svg{height:100%;width:auto;display:block}\n.tv-name{font-weight:700;font-size:calc(var(--tile,26vh)*.095);line-height:1.15;text-wrap:balance}\n.tv-tier{font-size:calc(var(--tile,26vh)*.075);color:#9A4A1F;display:flex;align-items:center;gap:.7vh;margin-top:-.3vh}\n.tv-tier i{flex:none;width:calc(var(--tile,26vh)*.06);height:calc(var(--tile,26vh)*.06);border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.08) inset}\n.tv-sups.compact{justify-content:stretch;gap:1vh 2vh}\n.tv-sups.compact .tv-sup{display:flex;align-items:center;gap:1vh;padding:.7vh 1.2vh;border-radius:1.2vh}\n.tv-sups.compact .tv-plate{display:none}\n.tv-sups.compact .tv-name{font-size:var(--f,2.4vh);flex:1;min-width:0;text-wrap:pretty}\n.tv-sups.compact .tv-tier{order:-1;margin:0;font-size:0}\n.tv-sups.compact .tv-tier i{width:calc(var(--f,2.4vh)*.8);height:calc(var(--f,2.4vh)*.8)}\n.tv-key h2{margin:0 0 1vh;font-family:var(--display);font-weight:400;color:var(--fab-red);font-size:3.3vh;line-height:1}\nhtml.fab-tv .tiers{grid-template-columns:repeat(5,1fr);gap:1.2vh}\nhtml.fab-tv .tiers li{padding:1vh .5vh;border-radius:1.6vh;gap:.2vh}\nhtml.fab-tv .tiers svg{width:5.2vh;height:6.6vh}\nhtml.fab-tv .tiers .nm{font-size:1.9vh}\nhtml.fab-tv .tiers .amt{font-size:1.8vh}\n.tv-invite{display:flex;align-items:center;gap:2.6vh;background:var(--fab-yellow);border-radius:2.4vh;padding:1.8vh 2.2vh 1.8vh 2.8vh}\n.tv-inv-text{flex:1;min-width:0}\n.tv-inv-title{margin:0;font-family:var(--display);font-size:4.3vh;color:var(--fab-red);line-height:1.04}\n.tv-inv-sub{margin:.9vh 0 0;font-size:2.35vh;line-height:1.38}\n.tv-inv-sub b{white-space:nowrap}\n.tv-qr{flex:none;display:grid;justify-items:center;gap:.5vh}\n.tv-qr-box{background:#fff;border-radius:1.4vh;padding:1.1vh;width:16.5vh;height:16.5vh}\n.tv-qr-box svg{display:block;width:100%;height:100%}\n.tv-qr span{font-size:1.7vh;font-weight:700;color:#6b3418}\n";
+  document.head.appendChild(st);
+  var QR = '<svg viewBox="-1 -1 35 35" aria-hidden="true"><path fill="#3A1D12" d="M0 0h7v1h-7zM8 0h2v1h-2zM11 0h1v1h-1zM14 0h2v1h-2zM17 0h2v1h-2zM23 0h1v1h-1zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM9 1h4v1h-4zM16 1h2v1h-2zM19 1h1v1h-1zM21 1h1v1h-1zM24 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM10 2h1v1h-1zM13 2h1v1h-1zM16 2h1v1h-1zM21 2h2v1h-2zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h2v1h-2zM14 3h2v1h-2zM17 3h2v1h-2zM20 3h1v1h-1zM22 3h2v1h-2zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h2v1h-2zM11 4h2v1h-2zM14 4h1v1h-1zM18 4h3v1h-3zM22 4h2v1h-2zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM11 5h1v1h-1zM16 5h4v1h-4zM22 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM10 7h1v1h-1zM15 7h4v1h-4zM21 7h1v1h-1zM24 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM11 8h1v1h-1zM16 8h2v1h-2zM19 8h4v1h-4zM25 8h5v1h-5zM32 8h1v1h-1zM0 9h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM8 9h3v1h-3zM12 9h5v1h-5zM18 9h1v1h-1zM23 9h1v1h-1zM25 9h1v1h-1zM29 9h3v1h-3zM0 10h2v1h-2zM3 10h1v1h-1zM5 10h3v1h-3zM9 10h4v1h-4zM15 10h1v1h-1zM17 10h1v1h-1zM20 10h7v1h-7zM29 10h1v1h-1zM0 11h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM8 11h2v1h-2zM11 11h2v1h-2zM14 11h2v1h-2zM17 11h2v1h-2zM20 11h2v1h-2zM24 11h3v1h-3zM31 11h1v1h-1zM1 12h1v1h-1zM5 12h2v1h-2zM8 12h1v1h-1zM10 12h6v1h-6zM18 12h4v1h-4zM23 12h1v1h-1zM26 12h1v1h-1zM28 12h2v1h-2zM3 13h3v1h-3zM7 13h2v1h-2zM12 13h1v1h-1zM16 13h2v1h-2zM19 13h1v1h-1zM22 13h4v1h-4zM29 13h1v1h-1zM0 14h1v1h-1zM2 14h1v1h-1zM5 14h2v1h-2zM8 14h1v1h-1zM10 14h3v1h-3zM16 14h1v1h-1zM18 14h2v1h-2zM23 14h4v1h-4zM28 14h1v1h-1zM30 14h2v1h-2zM4 15h2v1h-2zM7 15h1v1h-1zM9 15h1v1h-1zM11 15h1v1h-1zM17 15h7v1h-7zM25 15h2v1h-2zM0 16h2v1h-2zM4 16h4v1h-4zM10 16h1v1h-1zM13 16h1v1h-1zM15 16h1v1h-1zM17 16h1v1h-1zM20 16h3v1h-3zM24 16h1v1h-1zM26 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM0 17h1v1h-1zM4 17h1v1h-1zM11 17h1v1h-1zM14 17h5v1h-5zM23 17h1v1h-1zM25 17h1v1h-1zM29 17h3v1h-3zM0 18h3v1h-3zM5 18h2v1h-2zM11 18h1v1h-1zM15 18h2v1h-2zM18 18h1v1h-1zM21 18h4v1h-4zM27 18h1v1h-1zM29 18h1v1h-1zM31 18h1v1h-1zM0 19h3v1h-3zM4 19h2v1h-2zM7 19h2v1h-2zM12 19h1v1h-1zM16 19h1v1h-1zM19 19h1v1h-1zM21 19h1v1h-1zM23 19h5v1h-5zM31 19h2v1h-2zM0 20h2v1h-2zM3 20h5v1h-5zM9 20h1v1h-1zM11 20h4v1h-4zM16 20h1v1h-1zM19 20h1v1h-1zM23 20h4v1h-4zM28 20h2v1h-2zM0 21h2v1h-2zM7 21h2v1h-2zM11 21h1v1h-1zM13 21h1v1h-1zM17 21h4v1h-4zM23 21h1v1h-1zM27 21h1v1h-1zM29 21h3v1h-3zM2 22h2v1h-2zM6 22h1v1h-1zM8 22h1v1h-1zM10 22h2v1h-2zM14 22h2v1h-2zM18 22h1v1h-1zM20 22h5v1h-5zM27 22h1v1h-1zM29 22h3v1h-3zM2 23h1v1h-1zM4 23h2v1h-2zM12 23h2v1h-2zM15 23h3v1h-3zM21 23h1v1h-1zM23 23h1v1h-1zM26 23h3v1h-3zM31 23h2v1h-2zM0 24h2v1h-2zM5 24h2v1h-2zM9 24h3v1h-3zM14 24h1v1h-1zM16 24h2v1h-2zM19 24h10v1h-10zM8 25h1v1h-1zM10 25h1v1h-1zM15 25h2v1h-2zM18 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h2v1h-2zM0 26h7v1h-7zM8 26h2v1h-2zM12 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM21 26h2v1h-2zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h2v1h-2zM31 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM10 27h2v1h-2zM13 27h1v1h-1zM17 27h6v1h-6zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h2v1h-2zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM10 28h3v1h-3zM14 28h2v1h-2zM18 28h1v1h-1zM20 28h1v1h-1zM24 28h6v1h-6zM31 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM10 29h2v1h-2zM14 29h1v1h-1zM16 29h1v1h-1zM19 29h1v1h-1zM23 29h2v1h-2zM26 29h4v1h-4zM31 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM9 30h1v1h-1zM11 30h2v1h-2zM16 30h1v1h-1zM18 30h2v1h-2zM22 30h1v1h-1zM26 30h3v1h-3zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h2v1h-2zM14 31h1v1h-1zM17 31h1v1h-1zM19 31h4v1h-4zM24 31h2v1h-2zM0 32h7v1h-7zM8 32h1v1h-1zM10 32h6v1h-6zM17 32h1v1h-1zM20 32h2v1h-2zM24 32h1v1h-1zM29 32h1v1h-1zM32 32h1v1h-1z"/></svg>';
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function build(){
+    var wrap = document.querySelector(".wrap");
+    var panel = document.createElement("section");
+    panel.className = "tv-panel";
+    panel.innerHTML =
+      '<header class="tv-head"><h1>Thank you to every business on our tree</h1><p class="tv-count" id="tvCount"></p></header>' +
+      '<div class="tv-sups" id="tvSups"></div>' +
+      '<div class="tv-key"><h2>What each decoration means</h2></div>' +
+      '<div class="tv-invite"><div class="tv-inv-text"><p class="tv-inv-title">Would your business like a bauble?</p>' +
+      '<p class="tv-inv-sub">Scan the code to choose your decoration and hang your logo on our tree, or email <b>contact@bemorefab.co.uk</b></p></div>' +
+      '<div class="tv-qr"><div class="tv-qr-box">' + QR + '</div><span>Scan me</span></div></div>';
+    wrap.appendChild(panel);
+    var tiers = document.getElementById("tiers");
+    if (tiers) panel.querySelector(".tv-key").appendChild(tiers);
+    var n = placed.length;
+    document.getElementById("tvCount").innerHTML = "<b>" + n + "</b> " + (n === 1 ? "business has" : "businesses have") + " hung a decoration so far this Christmas";
+    // biggest decorations first, then in the order they joined
+    var list = placed.map(function(s, i){ return {s:s, i:i}; });
+    list.sort(function(a, b){ return TIER_ORDER.indexOf(b.s.sup.tier) - TIER_ORDER.indexOf(a.s.sup.tier) || a.i - b.i; });
+    var box = document.getElementById("tvSups");
+    list.forEach(function(o){
+      var sup = o.s.sup, T = TIER[sup.tier] || {};
+      var d = document.createElement("div");
+      d.className = "tv-sup";
+      var plate = sup.logo ? '<div class="tv-plate" style="background:' + esc(sup.plate || "#fff") + '"><img alt="" src="' + sup.logo + '"></div>'
+                           : '<div class="tv-plate" style="background:#fff"></div>';
+      d.innerHTML = plate + '<div class="tv-name">' + esc(sup.name) + '</div><div class="tv-tier"><i style="background:' + (T.dot || "#E84432") + '"></i>' + esc((T.label || "").replace(" bauble", "")) + '</div>';
+      if (!sup.logo && sup.tier === "candy"){
+        var svg = el("svg", {viewBox:"-40 -12 80 116", "aria-hidden":"true"});
+        drawCandy(svg, {L:6});
+        d.querySelector(".tv-plate").appendChild(svg);
+      }
+      d._s = o.s;
+      box.appendChild(d);
+    });
+    fit(box);
+    window.addEventListener("resize", function(){ fit(box); });
+    return box;
+  }
+  function fit(box){
+    var vh = window.innerHeight / 100, cs = getComputedStyle(box);
+    var gap = parseFloat(cs.columnGap) || 0, W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var n = box.children.length, ok = false, tw = 0;
+    box.classList.remove("compact");
+    box.style.removeProperty("--f");
+    if (!fit.again){ var k0 = document.querySelector(".tv-key"); if (k0) k0.style.display = ""; }
+    // logo tiles: the fewest columns that fit gives the biggest tiles
+    for (var cols = 1; cols <= Math.max(1, n); cols++){
+      tw = (W - gap * (cols - 1)) / cols;
+      if (tw > 50 * vh) continue;
+      box.style.gridTemplateColumns = "repeat(" + cols + "," + Math.floor(tw) + "px)";
+      box.style.setProperty("--tile", Math.floor(tw) + "px");
+      if (box.scrollHeight <= box.clientHeight + 1){ ok = true; break; }
+    }
+    if (ok && tw >= 15 * vh) return;
+    // lots of businesses: switch to a names list so every name stays readable from across the room
+    box.classList.add("compact");
+    var best = null;
+    for (var c = 1; c <= 4; c++){
+      box.style.gridTemplateColumns = "repeat(" + c + ",minmax(0,1fr))";
+      for (var f = 3.4; f >= 1.4; f -= 0.1){
+        box.style.setProperty("--f", f.toFixed(2) + "vh");
+        if (box.scrollHeight <= box.clientHeight + 1){ if (!best || f > best.f + 0.05) best = {c: c, f: f}; break; }
+      }
+    }
+    if (!best) best = {c: 4, f: 1.4};
+    var key = document.querySelector(".tv-key");
+    if (best.f < 2.3 && key && key.style.display !== "none"){
+      // very long list: the tree already shows the colours, so give the names the key's space
+      key.style.display = "none";
+      fit.again = true; fit(box); fit.again = false;
+      return;
+    }
+    box.style.gridTemplateColumns = "repeat(" + best.c + ",minmax(0,1fr))";
+    box.style.setProperty("--f", best.f.toFixed(2) + "vh");
+  }
+  function run(){
+    var box = build();
+    var tiles = [].slice.call(box.children);
+    var order = placed.slice(), idx = order.length - 1;
+    function mark(s){ tiles.forEach(function(t){ t.classList.toggle("on", t._s === s); }); }
+    mark(order[idx]);
+    function spotlight(){
+      if (!order.length || typeof arrival !== "undefined" && arrival) return;
+      idx = (idx + 1) % order.length;
+      var s = order[idx];
+      try {
+        BANNER.l2.setAttribute("font-size", 30);
+        setBanner(s.sup);
+        bannerIn(performance.now());
+        burst(s.hx, s.hy + ((s.shape && s.shape.cy) || 0), 26, 300);
+      } catch (e) {}
+      mark(s);
+    }
+    setTimeout(function(){ setInterval(spotlight, 12000); }, 4000);
+    // replay the newest bauble's arrival every 10 minutes
+    setInterval(function(){ try { idx = order.length - 1; mark(order[idx]); BANNER.l2.setAttribute("font-size", 30); startArrival(); } catch (e) {} }, 600000);
+    // pick up new businesses: check every 5 minutes, and only reload when the new page has downloaded fine
+    var base = null, started = Date.now();
+    function sig(t){ var h = 0; for (var i = 0; i < t.length; i += 5) h = (h * 31 + t.charCodeAt(i)) | 0; return t.length + ":" + h; }
+    function check(){
+      fetch(location.pathname + "?view=tv&check=" + Date.now(), {cache: "no-store"})
+        .then(function(r){ return r.ok ? r.text() : null; })
+        .then(function(t){
+          if (!t || t.indexOf("SUPPORTERS") < 0) return;
+          var s = sig(t);
+          if (base === null) base = s;
+          else if (s !== base || Date.now() - started > 6 * 3600 * 1000) location.reload();
+        })
+        .catch(function(){});
+    }
+    check();
+    setInterval(check, 300000);
+  }
+  function go(){ (window.__treeReady || Promise.resolve()).then(function(){ setTimeout(run, 50); }); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+})();
+</script>
 </head>
 <body>
 <main class="wrap">
