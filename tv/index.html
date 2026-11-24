@@ -2,9 +2,270 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<title>FAB Donation Tree (office TV)</title>
-<meta http-equiv="refresh" content="0; url=../?view=tv">
-<script>location.replace("../?view=tv");</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>FAB Donation Tree · office TV</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#FFF8EE;cursor:none}
+#stage iframe{position:fixed;inset:0;width:100%;height:100%;border:0;transition:opacity .8s ease}
+#catch{position:fixed;inset:0;z-index:5}
+#awake{position:fixed;right:0;bottom:0;width:8px;height:8px;opacity:.02;pointer-events:none}
+#hint{position:fixed;left:50%;bottom:1.6vh;transform:translateX(-50%);z-index:10;background:rgba(58,29,18,.88);color:#fff;
+  font:600 2.4vh/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:.9vh 2.2vh;border-radius:99px;white-space:nowrap;display:none}
+</style>
 </head>
-<body style="margin:0;background:#FFF8EE;font-family:sans-serif"><p style="padding:20px"><a href="../?view=tv">Open the FAB Donation Tree</a></p></body>
+<body>
+<div id="stage"></div>
+<div id="catch"></div>
+<video id="awake" muted loop playsinline autoplay></video>
+<div id="hint"></div>
+<script>
+/* FAB Donation Tree - office TV.
+   Shows the tree, keeps the screen awake, checks every minute for new businesses and, when one is added,
+   runs the big celebration: jingle, "their name is coming up in 5 seconds", a 5-4-3-2-1 countdown, the
+   reveal, then the bauble flies onto the tree.
+   Extras: ?demo=1 previews the celebration with the newest business; ?voice=0 turns the spoken lines off. */
+(function(){
+  var SP = new URLSearchParams(location.search);
+  var DEMO = SP.get("demo") === "1", VOICE = SP.get("voice") !== "0";
+  var POLL = Math.max(5, +SP.get("poll") || 60) * 1000;
+  var PAGE = "../";
+  var stage = document.getElementById("stage"), hint = document.getElementById("hint"), vid = document.getElementById("awake");
+  var frame = null, frameBorn = 0, curBuild = "", lastTag = null, busy = false, waiting = null;
+  vid.src = "data:video/mp4;base64," + "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";
+
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function load(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  // ---- sounds (switched on by the first press of OK on the remote) ----
+  var AC = window.AudioContext || window.webkitAudioContext, ctx = null, bufs = {};
+  try { ctx = new AC(); } catch (e) {}
+  ["intro", "tick", "reveal", "fly"].forEach(function(n){
+    if (!ctx) return;
+    fetch(n + ".mp3").then(function(r){ return r.arrayBuffer(); })
+      .then(function(a){ return new Promise(function(res, rej){ ctx.decodeAudioData(a, res, rej); }); })
+      .then(function(b){ bufs[n] = b; }).catch(function(){});
+  });
+  function soundOn(){ return !!ctx && ctx.state === "running"; }
+  function play(n, rate, vol){
+    if (!soundOn() || !bufs[n]) return null;
+    var s = ctx.createBufferSource(), g = ctx.createGain();
+    s.buffer = bufs[n]; s.playbackRate.value = rate || 1; g.gain.value = vol == null ? 1 : vol;
+    s.connect(g); g.connect(ctx.destination); s.start();
+    return g;
+  }
+  function duck(g, to){ if (g) try { g.gain.setTargetAtTime(to, ctx.currentTime, .12); } catch (e) {} }
+  var voice = null;
+  function pickVoice(){
+    if (!window.speechSynthesis) return;
+    var vs = speechSynthesis.getVoices() || [];
+    voice = vs.filter(function(v){ return /en[-_]GB/i.test(v.lang); })[0] || vs.filter(function(v){ return /^en/i.test(v.lang); })[0] || null;
+  }
+  if (window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  function say(text){
+    return new Promise(function(res){
+      if (!VOICE || !window.speechSynthesis || !soundOn()) return res(false);
+      try {
+        speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-GB"; if (voice) u.voice = voice; u.rate = 1; u.pitch = 1.05; u.volume = 1;
+        u.onend = u.onerror = function(){ res(true); };
+        speechSynthesis.speak(u);
+        setTimeout(function(){ res(true); }, 9000);
+      } catch (e) { res(false); }
+    });
+  }
+
+  // ---- keep the Fire Stick and the TV awake ----
+  var lock = null;
+  function awake(){
+    if ("wakeLock" in navigator && !lock && document.visibilityState === "visible")
+      navigator.wakeLock.request("screen").then(function(l){ lock = l; l.addEventListener("release", function(){ lock = null; }); updHint(); }).catch(function(){});
+    if (vid.paused) vid.play().then(updHint).catch(function(){});
+  }
+  function updHint(){
+    var msg = "";
+    if (!soundOn()) msg = "Press OK on the remote to switch on the celebration sounds";
+    else if (!lock && vid.paused) msg = "Press OK on the remote once to keep the screen on";
+    if (waiting) msg = "";
+    hint.textContent = msg;
+    hint.style.display = msg ? "block" : "none";
+  }
+  function unlock(){
+    if (ctx && ctx.state !== "running") ctx.resume().then(updHint, updHint);
+    if (window.speechSynthesis && !unlock.sp){
+      unlock.sp = true;
+      try { var u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+    }
+    awake();
+    if (waiting){ var w = waiting; waiting = null; setTimeout(w, 400); }
+    updHint();
+  }
+  ["click", "keydown", "pointerdown", "touchend"].forEach(function(t){ document.addEventListener(t, unlock, true); });
+  window.addEventListener("message", function(e){
+    if (frame && e.source === frame.contentWindow && e.data && e.data.fabTree === "key") unlock();
+  });
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible"){ awake(); if (ctx && ctx.state !== "running") ctx.resume().then(updHint, updHint); } });
+  setInterval(function(){ awake(); updHint(); }, 60000);
+  if (ctx) ctx.onstatechange = updHint;
+
+  // ---- the tree, in a frame; a new copy is loaded behind the old one and swapped in once it is ready ----
+  function swap(build, hold){
+    return new Promise(function(res){
+      var f = document.createElement("iframe"), first = !frame, done = false;
+      f.setAttribute("title", "FAB Donation Tree");
+      f.style.opacity = first ? 1 : 0;
+      f.src = PAGE + "?view=tv&shell=1" + (hold ? "&hold=" + hold : "") + "&v=" + encodeURIComponent(build || Date.now());
+      stage.appendChild(f);
+      if (first){ frame = f; frameBorn = Date.now(); }
+      function finish(ok){
+        if (done) return; done = true;
+        window.removeEventListener("message", on); clearTimeout(to);
+        if (!ok && !first){ f.remove(); return res(null); }
+        var old = frame === f ? null : frame;
+        frame = f; frameBorn = Date.now(); curBuild = build || curBuild;
+        f.style.opacity = 1;
+        if (old) setTimeout(function(){ old.remove(); }, 900);
+        res(f);
+      }
+      function on(e){ if (e.source === f.contentWindow && e.data && e.data.fabTree === "ready") finish(true); }
+      window.addEventListener("message", on);
+      var to = setTimeout(function(){ finish(false); }, 90000);
+    });
+  }
+  function send(f, d){ try { f.contentWindow.postMessage({fabCeleb: d}, location.origin === "null" ? "*" : location.origin); } catch (e) {} }
+
+  // wait for someone to press OK (so the sounds can play); after 10 minutes go ahead anyway, silently
+  function whenSoundReady(f, demo){
+    if (soundOn()) return Promise.resolve();
+    send(f, {step: "wait", demo: demo});
+    return new Promise(function(res){
+      var t = setTimeout(function(){ if (waiting){ waiting = null; res(); } }, demo ? 864e5 : 600000);
+      waiting = function(){ clearTimeout(t); res(); };
+      updHint();
+    });
+  }
+
+  async function celebrate(f, names){
+    var many = names.length > 1;
+    send(f, {step: "intro", names: names});
+    var g = play("intro");
+    await wait(2300);
+    duck(g, .3);
+    var spoken = say(many ? "Exciting news! " + names.length + " new businesses are joining our tree. Their names are coming up in five seconds!"
+                          : "Exciting news! A new business is joining our tree. Their name is coming up in five seconds!");
+    await Promise.all([wait(3700), Promise.race([spoken, wait(7500)])]);
+    for (var n = 5; n >= 1; n--){
+      send(f, {step: "count", n: n, names: names});
+      play("tick", Math.pow(2, (5 - n) * 2 / 12));
+      await wait(1000);
+    }
+    for (var i = 0; i < names.length; i++){
+      send(f, {step: "reveal", name: names[i], names: names});
+      var r = play("reveal");
+      await wait(1300);
+      duck(r, .45);
+      var s2 = say("Please welcome " + names[i] + "!");
+      await Promise.all([wait(i < names.length - 1 ? 4200 : 5600), Promise.race([s2, wait(6000)])]);
+    }
+    send(f, {step: "fly"});
+    await wait(700);
+    send(f, {step: "drop"});
+    play("fly");
+    await wait(4000);
+  }
+
+  // ---- what's on the tree right now? ----
+  function namesIn(html){
+    var out = [], re = /\{\s*name:\s*"((?:[^"\\]|\\.)*)"\s*,\s*tier:\s*"\w+"/g, m;
+    while ((m = re.exec(html))){ try { out.push(JSON.parse('"' + m[1] + '"')); } catch (e) { out.push(m[1]); } }
+    return out;
+  }
+  function remember(list){
+    var seen = load("fabTreeSeen") || [];
+    list.forEach(function(n){ if (seen.indexOf(n) < 0) seen.push(n); });
+    save("fabTreeSeen", seen); save("fabTreeLive", list);
+  }
+  function tagOf(r){ return r.headers.get("etag") || r.headers.get("last-modified") || ""; }
+
+  async function check(first){
+    if (busy) return;
+    busy = true;
+    try {
+      if (!first){
+        var h = await fetch(PAGE + "?view=tv&ping=" + Date.now(), {method: "HEAD", cache: "no-store"});
+        var tag = h.ok ? tagOf(h) : null;
+        var stale = Date.now() - frameBorn > 6 * 3600 * 1000;
+        if (tag === null || (tag && tag === lastTag && !stale)) return;
+      }
+      var r = await fetch(PAGE + "?view=tv&check=" + Date.now(), {cache: "no-store"});
+      if (!r.ok) throw 0;
+      var html = await r.text();
+      if (html.indexOf("SUPPORTERS") < 0) throw 0;
+      var m = html.match(/<meta name="fab-build" content="([^"]+)"/), build = m ? m[1] : String(Date.now());
+      var list = namesIn(html), seen = load("fabTreeSeen"), was = load("fabTreeLive");
+      var fresh = [];
+      if (seen && was && list.length > was.length)
+        fresh = list.filter(function(n){ return seen.indexOf(n) < 0; }).slice(-(list.length - was.length));
+      if (!fresh.length){
+        remember(list);
+        if (first || build !== curBuild || Date.now() - frameBorn > 6 * 3600 * 1000) await swap(build, 0);
+        lastTag = tagOf(r);
+        return;
+      }
+      var f = await swap(build, fresh.length);
+      if (!f) return;
+      lastTag = tagOf(r);
+      await whenSoundReady(f, false);
+      await celebrate(f, fresh);
+      remember(list);
+    } catch (e) {
+      if (first && !frame) swap("", 0);
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function demo(){
+    while (true){
+      busy = true;
+      try {
+        var r = await fetch(PAGE + "?view=tv&check=" + Date.now(), {cache: "no-store"});
+        var list = namesIn(await r.text());
+        var f = await swap(curBuild || String(Date.now()), 1);
+        if (f && list.length){
+          await new Promise(function(res){ send(f, {step: "wait", demo: true}); waiting = res; updHint(); });
+          await celebrate(f, [list[list.length - 1]]);
+        }
+      } catch (e) {}
+      busy = false;
+      await wait(15000);
+    }
+  }
+
+  // the TV page itself was updated: reload it (only between celebrations)
+  var myTag = null;
+  function selfCheck(){
+    if (busy) return;
+    fetch(location.pathname + "?ping=" + Date.now(), {method: "HEAD", cache: "no-store"}).then(function(r){
+      var t = r.ok ? tagOf(r) : "";
+      if (!t) return;
+      if (myTag === null) myTag = t;
+      else if (t !== myTag && !busy){ var q = new URLSearchParams(location.search); q.set("r", Date.now()); location.replace(location.pathname + "?" + q); }
+    }).catch(function(){});
+  }
+
+  updHint();
+  awake();
+  if (DEMO){ check(true).then(demo); }
+  else {
+    check(true);
+    setInterval(function(){ check(false); }, POLL);
+  }
+  selfCheck();
+  setInterval(selfCheck, 1800000);
+})();
+</script>
+</body>
 </html>
