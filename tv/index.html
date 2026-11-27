@@ -86,8 +86,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:#FFF8EE;cursor:none}
   }
   function updHint(){
     var msg = "";
-    if (!soundOn()) msg = "Press OK on the remote to switch on the celebration sounds";
-    else if (!lock && vid.paused) msg = "Press OK on the remote once to keep the screen on";
+    if (SP.get("hints") === "1"){   // on-screen prompts only when asked for (?hints=1); the office TV never shows them
+      if (!soundOn()) msg = "Press OK on the remote to switch on the celebration sounds";
+      else if (!lock && vid.paused) msg = "Press OK on the remote once to keep the screen on";
+    }
     if (waiting) msg = "";
     hint.textContent = msg;
     hint.style.display = msg ? "block" : "none";
@@ -136,15 +138,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:#FFF8EE;cursor:none}
   }
   function send(f, d){ try { f.contentWindow.postMessage({fabCeleb: d}, location.origin === "null" ? "*" : location.origin); } catch (e) {} }
 
-  // wait for someone to press OK (so the sounds can play); after 10 minutes go ahead anyway, silently
+  // never ask anyone to press OK: try to switch the sounds on, then carry on (silently if the browser says no)
   function whenSoundReady(f, demo){
     if (soundOn()) return Promise.resolve();
-    send(f, {step: "wait", demo: demo});
-    return new Promise(function(res){
-      var t = setTimeout(function(){ if (waiting){ waiting = null; res(); } }, demo ? 864e5 : 600000);
-      waiting = function(){ clearTimeout(t); res(); };
-      updHint();
-    });
+    try { if (ctx && ctx.state !== "running") ctx.resume().then(updHint, updHint); } catch (e) {}
+    return wait(500);
   }
 
   async function celebrate(f, names){
